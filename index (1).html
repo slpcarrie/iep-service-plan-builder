@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IEP / Service Plan Builder</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap');
+
+  :root{
+    --paper: #F1F4EE;
+    --card: #FCFDFB;
+    --ink: #23302A;
+    --ink-soft: #55645B;
+    --sage: #4F7A63;
+    --sage-dark: #365546;
+    --teal: #2F5D62;
+    --gold: #C7883F;
+    --gold-soft: #F2E4CC;
+    --line: #D8DED2;
+    --error: #B3543F;
+    --radius: 10px;
+  }
+
+  *{ box-sizing: border-box; }
+
+  body{
+    margin:0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    line-height: 1.5;
+  }
+
+  .wrap{
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 40px 28px 80px;
+  }
+
+  header.top{
+    margin-bottom: 32px;
+    position: relative;
+  }
+
+  .eyebrow{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--sage-dark);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .eyebrow::before{
+    content: "";
+    width: 22px;
+    height: 1px;
+    background: var(--sage);
+  }
+
+  h1{
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: clamp(28px, 4vw, 40px);
+    margin: 0 0 10px;
+    letter-spacing: -0.01em;
+  }
+
+  .sub{
+    max-width: 640px;
+    color: var(--ink-soft);
+    font-size: 15px;
+  }
+
+  .privacy-note{
+    margin-top: 16px;
+    display: inline-flex;
+    gap: 10px;
+    align-items: flex-start;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--sage);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    font-size: 13px;
+    color: var(--ink-soft);
+    max-width: 640px;
+  }
+
+  .grid{
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 28px;
+    align-items: start;
+  }
+
+  @media (max-width: 940px){
+    .grid{ grid-template-columns: 1fr; }
+  }
+
+  .panel{
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 28px;
+  }
+
+  .panel.output{
+    position: sticky;
+    top: 24px;
+  }
+  @media (max-width: 940px){
+    .panel.output{ position: static; }
+  }
+
+  .section-title{
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--sage-dark);
+    margin: 0 0 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-num{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--sage);
+    background: #E7EEE4;
+    border-radius: 5px;
+    padding: 2px 7px;
+  }
+
+  .field-block{
+    margin-top: 26px;
+    padding-top: 22px;
+    border-top: 1px solid var(--line);
+  }
+  .field-block:first-of-type{
+    margin-top: 22px;
+  }
+
+  label.field-label{
+    display: block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 8px;
+  }
+
+  .hint{
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    margin: -4px 0 10px;
+  }
+
+  input[type="text"], textarea, select{
+    width: 100%;
+    font-family: 'Inter', sans-serif;
+    font-size: 14.5px;
+    color: var(--ink);
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 10px 12px;
+    resize: vertical;
+  }
+  input[type="text"]:focus, textarea:focus, select:focus{
+    outline: 2px solid var(--sage);
+    outline-offset: 1px;
+    border-color: var(--sage);
+  }
+
+  textarea{ min-height: 60px; }
+
+  .pronoun-row{
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .pronoun-row select{ max-width: 220px; }
+  .pronoun-row input{ flex: 1; min-width: 160px; }
+
+  .checkbox-grid{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 16px;
+  }
+  @media (max-width: 480px){
+    .checkbox-grid{ grid-template-columns: 1fr; }
+  }
+
+  .check-item{
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 9px 12px;
+    cursor: pointer;
+    font-size: 13.5px;
+  }
+  .check-item:has(input:checked){
+    border-color: var(--sage);
+    background: #EEF3EA;
+  }
+  .check-item input{ accent-color: var(--sage); width: 15px; height: 15px; }
+
+  .toggle-row{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .toggle-row input{ accent-color: var(--sage); width: 17px; height: 17px; }
+
+  .item-card{
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 16px;
+    margin-top: 12px;
+    position: relative;
+  }
+  .item-card-head{
+    display:flex;
+    justify-content: space-between;
+    align-items:center;
+    margin-bottom: 10px;
+  }
+  .item-tag{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--teal);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .remove-btn{
+    background: none;
+    border: none;
+    color: var(--error);
+    font-size: 12px;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    padding: 3px 6px;
+  }
+  .remove-btn:hover{ text-decoration: underline; }
+
+  .item-card .sub-field{ margin-bottom: 10px; }
+  .item-card .sub-field:last-child{ margin-bottom: 0; }
+  .item-card label.mini-label{
+    font-size: 11.5px;
+    color: var(--ink-soft);
+    display: block;
+    margin-bottom: 5px;
+  }
+
+  .add-btn{
+    margin-top: 12px;
+    background: #fff;
+    border: 1.5px dashed var(--sage);
+    color: var(--sage-dark);
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    padding: 9px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
+  }
+  .add-btn:hover{ background: #EEF3EA; }
+
+  #priorGoalsContainer, #newGoalsContainer{ display: none; }
+  #priorGoalsContainer.visible, #newGoalsContainer.visible{ display: block; }
+
+  .generate-bar{
+    margin-top: 30px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+  }
+
+  .generate-btn{
+    width: 100%;
+    background: var(--sage-dark);
+    color: #fff;
+    border: none;
+    border-radius: 9px;
+    padding: 14px 18px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .generate-btn:hover{ background: var(--sage); }
+  .generate-btn:disabled{ background: #A9B6AD; cursor: not-allowed; }
+
+  .error-msg{
+    color: var(--error);
+    font-size: 13px;
+    margin-top: 10px;
+    display: none;
+  }
+
+  /* Output panel */
+  .reminder-banner{
+    background: var(--gold-soft);
+    border: 1px solid #E3C692;
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 13px;
+    color: #6B4A1F;
+    margin-bottom: 20px;
+    display: flex;
+    gap: 10px;
+  }
+
+  .output-actions{
+    display: flex;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+  .copy-btn, .reset-btn{
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 9px 14px;
+    border-radius: 7px;
+    cursor: pointer;
+    border: 1px solid var(--line);
+    background: #fff;
+    color: var(--ink);
+  }
+  .copy-btn{
+    background: var(--teal);
+    color: #fff;
+    border-color: var(--teal);
+  }
+  .copy-btn:hover{ background: #244C50; }
+  .reset-btn:hover{ background: #F3F3EF; }
+  .copy-btn:disabled{ background: #B7C4C4; border-color: #B7C4C4; cursor: not-allowed; }
+
+  .output-empty{
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--ink-soft);
+  }
+  .output-empty .root-divider{
+    margin: 0 auto 18px;
+    width: 120px;
+    opacity: 0.55;
+  }
+  .output-empty p{ font-size: 13.5px; max-width: 320px; margin: 0 auto; }
+
+  .output-loading{
+    text-align: center;
+    padding: 70px 20px;
+    color: var(--ink-soft);
+    font-size: 14px;
+  }
+  .spinner{
+    width: 26px; height: 26px;
+    border: 3px solid var(--line);
+    border-top-color: var(--sage);
+    border-radius: 50%;
+    margin: 0 auto 16px;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin{ to{ transform: rotate(360deg); } }
+
+  .output-content h3{
+    font-family: 'Fraunces', serif;
+    font-size: 16.5px;
+    font-weight: 600;
+    color: var(--teal);
+    margin: 26px 0 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .output-content h3:first-child{ margin-top: 0; }
+  .output-content h3::before{
+    content: "";
+    width: 6px; height: 6px;
+    background: var(--sage);
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .output-content p{
+    font-size: 14.5px;
+    color: var(--ink);
+    margin: 0 0 14px;
+  }
+  .output-content ul{
+    margin: 0 0 14px;
+    padding-left: 20px;
+  }
+  .output-content li{
+    font-size: 14.5px;
+    margin-bottom: 6px;
+  }
+  .output-content strong.client-tag{
+    background: #FBE9C6;
+    padding: 0 3px;
+    border-radius: 3px;
+  }
+
+  footer.foot{
+    max-width: 640px;
+    margin: 40px auto 0;
+    text-align: center;
+    font-size: 12px;
+    color: var(--ink-soft);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="eyebrow">Speech and Language Kids &middot; Therapy Plan Tool</div>
+    <h1>IEP / Service Plan Builder</h1>
+    <p class="sub">Turn your rough clinical notes into warm, parent-friendly narrative sections you can copy straight into an IEP, service plan, or progress note — present levels, prior progress, new goal narratives, and accommodation ideas.</p>
+    <div class="privacy-note">
+      <span>🔒</span>
+      <span>No identifying information is collected or stored here. The output always refers to <strong>"Client"</strong> — swap in the real name after you paste it into your system.</span>
+    </div>
+  </header>
+
+  <div class="grid">
+
+    <!-- INPUT PANEL -->
+    <div class="panel input">
+      <h2 class="section-title"><span class="section-num">IN</span>Client Details</h2>
+
+      <div class="field-block" style="margin-top:18px; padding-top:0; border-top:none;">
+        <label class="field-label">Pronouns</label>
+        <div class="pronoun-row">
+          <select id="pronounSelect" onchange="toggleCustomPronoun()">
+            <option value="he/him/his">He / Him / His</option>
+            <option value="she/her/hers">She / Her / Hers</option>
+            <option value="they/them/theirs">They / Them / Theirs</option>
+            <option value="custom">Other (specify)</option>
+          </select>
+          <input type="text" id="pronounCustom" placeholder="e.g., ze/zir/zirs" style="display:none;">
+        </div>
+      </div>
+
+      <div class="field-block">
+        <label class="field-label">What does the client qualify for?</label>
+        <p class="hint">Diagnosis, eligibility category, or type of service (e.g., "Speech or Language Impairment," "articulation disorder," "school-based speech therapy services").</p>
+        <input type="text" id="qualification" placeholder="e.g., Speech or Language Impairment (SLI)">
+      </div>
+
+      <div class="field-block">
+        <label class="field-label">Areas of Need in Communication</label>
+        <div class="checkbox-grid">
+          <label class="check-item"><input type="checkbox" value="Speech Sound Production" class="area-check"> Speech Sound Production</label>
+          <label class="check-item"><input type="checkbox" value="Language Skills" class="area-check"> Language Skills</label>
+          <label class="check-item"><input type="checkbox" value="Functional Communication" class="area-check"> Functional Communication</label>
+          <label class="check-item"><input type="checkbox" value="Fluency" class="area-check"> Fluency</label>
+          <label class="check-item"><input type="checkbox" value="Social Communication" class="area-check"> Social Communication</label>
+          <label class="check-item"><input type="checkbox" value="Voice/Resonance" class="area-check"> Voice/Resonance</label>
+        </div>
+      </div>
+
+      <div class="field-block">
+        <label class="toggle-row">
+          <input type="checkbox" id="priorProgressToggle" onchange="togglePriorProgress()">
+          Client has received speech-language therapy previously
+        </label>
+        <div id="priorGoalsContainer"></div>
+        <button class="add-btn" id="addPriorBtn" style="display:none;" onclick="addPriorGoal()">+ Add previous goal</button>
+      </div>
+
+      <div class="field-block">
+        <label class="field-label">New Goals for This Year</label>
+        <p class="hint">For each goal: describe the specific challenge, what it looks like in the natural environment, and the goal itself (include accuracy level and level of support allowed).</p>
+        <div id="newGoalsContainer" class="visible"></div>
+        <button class="add-btn" onclick="addNewGoal()">+ Add another goal</button>
+      </div>
+
+      <div class="generate-bar">
+        <button class="generate-btn" id="generateBtn" onclick="generateNarrative()">✦ Generate Narrative</button>
+        <div class="error-msg" id="errorMsg"></div>
+      </div>
+    </div>
+
+    <!-- OUTPUT PANEL -->
+    <div class="panel output">
+      <h2 class="section-title"><span class="section-num">OUT</span>Copy-Paste Narrative</h2>
+
+      <div style="margin-top:18px;">
+        <div class="reminder-banner">
+          <span>📋</span>
+          <span>Use this as a <strong>starting point</strong>. Copy each section into your therapy plan system and tailor the wording to this specific client — replace every instance of <strong>"Client"</strong> with their actual name first.</span>
+        </div>
+
+        <div class="output-actions">
+          <button class="copy-btn" id="copyBtn" disabled onclick="copyOutput()">Copy All Text</button>
+          <button class="reset-btn" onclick="resetForm()">Start Over</button>
+        </div>
+
+        <div id="outputArea">
+          <div class="output-empty" id="outputEmpty">
+            <svg class="root-divider" viewBox="0 0 120 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M60 2 L60 14 M60 14 L30 26 M60 14 L90 26 M30 26 L15 38 M30 26 L38 38 M90 26 L78 38 M90 26 L102 38" stroke="#4F7A63" stroke-width="1.5" stroke-linecap="round"/>
+              <circle cx="60" cy="2" r="3" fill="#C7883F"/>
+            </svg>
+            <p>Fill in the client details on the left, then generate to see the narrative sections here.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer class="foot">Built for Speech and Language Kids &middot; No client-identifying data is stored or transmitted beyond what you type into this form.</footer>
+</div>
+
+<script>
+let priorGoalCount = 0;
+let newGoalCount = 0;
+
+// ⚠️ Replace this with your deployed Vercel function URL (Step 2 below)
+const API_ENDPOINT = "https://YOUR-VERCEL-PROJECT.vercel.app/api/generate";
+
+function toggleCustomPronoun(){
+  const sel = document.getElementById('pronounSelect');
+  const custom = document.getElementById('pronounCustom');
+  custom.style.display = sel.value === 'custom' ? 'block' : 'none';
+}
+
+function togglePriorProgress(){
+  const checked = document.getElementById('priorProgressToggle').checked;
+  const container = document.getElementById('priorGoalsContainer');
+  const addBtn = document.getElementById('addPriorBtn');
+  container.classList.toggle('visible', checked);
+  addBtn.style.display = checked ? 'block' : 'none';
+  if(checked && container.children.length === 0){
+    addPriorGoal();
+  }
+}
+
+function addPriorGoal(){
+  priorGoalCount++;
+  const container = document.getElementById('priorGoalsContainer');
+  const div = document.createElement('div');
+  div.className = 'item-card prior-goal-item';
+  div.innerHTML = `
+    <div class="item-card-head">
+      <span class="item-tag">Previous Goal</span>
+      <button class="remove-btn" onclick="this.closest('.item-card').remove()">Remove</button>
+    </div>
+    <div class="sub-field">
+      <label class="mini-label">Past goal</label>
+      <textarea class="prior-goal-text" placeholder="What was the goal? e.g., produce /r/ in words with 80% accuracy"></textarea>
+    </div>
+    <div class="sub-field">
+      <label class="mini-label">Most recent performance</label>
+      <textarea class="prior-goal-performance" placeholder="e.g., most recently producing /r/ in words with 65% accuracy given moderate cues"></textarea>
+    </div>
+    <div class="sub-field">
+      <label class="mini-label">Outcome</label>
+      <select class="prior-goal-outcome">
+        <option value="Met the goal">Met the goal</option>
+        <option value="Partially met the goal / made progress">Partially met the goal / made progress</option>
+        <option value="Did not meet the goal">Did not meet the goal</option>
+        <option value="Still in progress">Still in progress</option>
+      </select>
+    </div>
+    <div class="sub-field">
+      <label class="mini-label">Notes (optional)</label>
+      <textarea class="prior-goal-notes" placeholder="Anything else worth including..."></textarea>
+    </div>
+  `;
+  container.appendChild(div);
+}
+
+function addNewGoal(){
+  newGoalCount++;
+  const container = document.getElementById('newGoalsContainer');
+  const div = document.createElement('div');
+  div.className = 'item-card new-goal-item';
+  div.innerHTML = `
+    <div class="item-card-head">
+      <span class="item-tag">New Goal</span>
+      <button class="remove-btn" onclick="removeNewGoal(this)">Remove</button>
+    </div>
+    <div class="sub-field">
+      <label class="mini-label">Specific challenge</label>
+      <textarea class="new-goal-challenge" placeholder="e.g., producing grammatically correct sentences in speech and written language"></textarea>
+    </div>
+    <div class="sub-field">
+      <label class="mini-label">What it looks like in the natural environment</label>
+      <textarea class="new-goal-environment" placeholder="e.g., leaves out verb endings during class discussions, writing shows fragmented sentences"></textarea>
+    </div>
+    <div class="sub-field">
+      <label class="mini-label">Goal (include accuracy level and level of support allowed)</label>
+      <textarea class="new-goal-text" placeholder="e.g., Client will produce grammatically correct sentences with 80% accuracy given minimal verbal cues"></textarea>
+    </div>
+    <div class="sub-field">
+      <label class="mini-label">How will this skill be addressed?</label>
+      <p class="hint" style="margin-top:-2px;">e.g., direct therapy; or supporting caregivers and educators with generalization strategies and resources</p>
+      <textarea class="new-goal-approach" placeholder="e.g., direct therapy sessions targeting this skill; or coaching classroom teacher on visual supports and sentence-expansion strategies to use during writing time"></textarea>
+    </div>
+  `;
+  container.appendChild(div);
+  updateRemoveButtons();
+}
+
+function removeNewGoal(btn){
+  btn.closest('.item-card').remove();
+  updateRemoveButtons();
+}
+
+function updateRemoveButtons(){
+  const items = document.querySelectorAll('.new-goal-item');
+  items.forEach((item, i) => {
+    const btn = item.querySelector('.remove-btn');
+    btn.style.visibility = items.length > 1 ? 'visible' : 'hidden';
+  });
+}
+
+// seed one new goal item on load
+addNewGoal();
+
+function getPronouns(){
+  const sel = document.getElementById('pronounSelect');
+  if(sel.value === 'custom'){
+    return document.getElementById('pronounCustom').value.trim() || 'they/them/theirs';
+  }
+  return sel.value;
+}
+
+function collectData(){
+  const pronouns = getPronouns();
+  const qualification = document.getElementById('qualification').value.trim();
+  const areas = Array.from(document.querySelectorAll('.area-check:checked')).map(el => el.value);
+
+  const priorGoals = [];
+  document.querySelectorAll('.prior-goal-item').forEach(item => {
+    const goal = item.querySelector('.prior-goal-text').value.trim();
+    const performance = item.querySelector('.prior-goal-performance').value.trim();
+    const outcome = item.querySelector('.prior-goal-outcome').value;
+    const notes = item.querySelector('.prior-goal-notes').value.trim();
+    if(goal || performance){
+      priorGoals.push({ goal, performance, outcome, notes });
+    }
+  });
+
+  const newGoals = [];
+  document.querySelectorAll('.new-goal-item').forEach(item => {
+    const challenge = item.querySelector('.new-goal-challenge').value.trim();
+    const environment = item.querySelector('.new-goal-environment').value.trim();
+    const goalText = item.querySelector('.new-goal-text').value.trim();
+    const approach = item.querySelector('.new-goal-approach').value.trim();
+    if(challenge || goalText){
+      newGoals.push({ challenge, environment, goalText, approach });
+    }
+  });
+
+  return { pronouns, qualification, areas, priorGoals, newGoals };
+}
+
+function showError(msg){
+  const el = document.getElementById('errorMsg');
+  el.textContent = msg;
+  el.style.display = msg ? 'block' : 'none';
+}
+
+async function generateNarrative(){
+  const data = collectData();
+
+  if(!data.qualification){
+    showError('Please fill in what the client qualifies for.');
+    return;
+  }
+  if(data.newGoals.length === 0){
+    showError('Please add at least one new goal.');
+    return;
+  }
+  showError('');
+
+  const btn = document.getElementById('generateBtn');
+  btn.disabled = true;
+  btn.textContent = 'Generating...';
+  document.getElementById('copyBtn').disabled = true;
+
+  const outputArea = document.getElementById('outputArea');
+  outputArea.innerHTML = `
+    <div class="output-loading">
+      <div class="spinner"></div>
+      Writing the narrative sections...
+    </div>
+  `;
+
+  const systemPrompt = `You are a clinical writing assistant helping speech-language pathologists draft narrative sections of therapy plans (IEPs, service plans, progress notes) that they will copy and paste into their official documentation system. Follow these rules exactly:
+
+1. Always refer to the individual as "Client" — never invent or use a real name. Use the pronoun set provided throughout.
+2. Write in warm, supportive, parent-friendly language while remaining clinically accurate and professional — appropriate for an IEP team or family to read.
+3. Do NOT invent new therapy goals. When describing planned intervention, reference the exact goal text the clinician provided, worked naturally into a sentence about how the skill will be addressed.
+9. Never use the word "individualized" (or "individually") when describing therapy or instruction — say "direct therapy" instead. This word can be misread as implying the client is not in group therapy.
+4. Do NOT recommend or state specific service minutes, session frequency, or duration.
+5. Do NOT add a diagnosis or eligibility category beyond exactly what was provided.
+6. Do NOT include any identifying information (no names, dates of birth, ID numbers, school names, etc.).
+7. Output ONLY the requested sections, using "## Section Title" as headers. Do not add any preamble, sign-off, or commentary outside the sections.
+8. Separate each individual item (each prior goal, each new goal) into its own distinct paragraph.
+
+Output exactly these sections, in this order:
+
+## Eligibility & Areas of Need
+One paragraph: a warm, clear statement of what Client qualifies for and a description of the areas of communication need, woven together naturally (not just a list).
+
+## Prior Progress
+(Only include this section if prior goal data is provided.) One paragraph per prior goal. Each paragraph should describe what was targeted, the most recent performance data given, whether the goal was met/partially met/not met/still in progress, and any additional notes — in honest but encouraging language.
+
+## New Goals for This Year
+One paragraph per new goal. Each paragraph must open with a direct statement of what Client currently struggles with — for example, "Client currently struggles to use past tense verbs accurately during conversation." Never open a goal paragraph with "Client is working on..." or similar phrasing. After that opening sentence, the paragraph must include, in flowing prose (not a list): (1) what struggling with this looks like day to day, (2) an impact statement connecting the challenge to Client's participation in the natural environment (classroom, home, social settings, etc.), and (3) a brief closing sentence describing how the skill will be addressed, based on the clinician's stated approach (which may be direct therapy, supporting caregivers/educators with generalization strategies and resources, or a mix of both), working toward the goal exactly as written by the clinician — quote or closely paraphrase the clinician's goal text so it is clearly recognizable. Do not default to assuming direct therapy if a different approach was specified.
+
+## Possible Accommodations & Modifications
+A bulleted list ("- " format) of realistic, tailored accommodation/modification ideas relevant to the specific needs and challenges described. Before the list, include one sentence noting these are optional ideas to consider, not requirements — the team should only include a modification or accommodation if it is genuinely needed for Client, and many clients will need none at all. If a need area was checked but not directly addressed by a new goal, make sure to include at least one relevant suggestion covering that area.`;
+
+  let userPrompt = `Pronouns to use: ${data.pronouns}\n\nWhat Client qualifies for: ${data.qualification}\n\nAreas of need checked: ${data.areas.length ? data.areas.join(', ') : 'none specified'}\n\n`;
+
+  if(data.priorGoals.length > 0){
+    userPrompt += `PRIOR PROGRESS DATA:\n`;
+    data.priorGoals.forEach((g, i) => {
+      userPrompt += `${i+1}. Past goal: ${g.goal || 'not specified'}\n   Most recent performance: ${g.performance || 'not specified'}\n   Outcome: ${g.outcome}\n   Notes: ${g.notes || 'none'}\n\n`;
+    });
+  } else {
+    userPrompt += `PRIOR PROGRESS DATA: None — Client has not received therapy previously. Omit the Prior Progress section entirely.\n\n`;
+  }
+
+  userPrompt += `NEW GOALS DATA:\n`;
+  data.newGoals.forEach((g, i) => {
+    userPrompt += `${i+1}. Specific challenge: ${g.challenge || 'not specified'}\n   What it looks like in the natural environment: ${g.environment || 'not specified'}\n   Goal (as written by clinician, including accuracy/support level): ${g.goalText || 'not specified'}\n   How this skill will be addressed: ${g.approach || 'not specified — use general language about targeted intervention'}\n\n`;
+  });
+
+  try{
+    const response = await fetch(API_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        system: systemPrompt,
+        messages: [{ role: "user", content: userPrompt }]
+      })
+    });
+
+    const result = await response.json();
+    const textBlocks = (result.content || []).filter(b => b.type === 'text').map(b => b.text);
+    const fullText = textBlocks.join('\n');
+
+    if(!fullText){
+      throw new Error('No content returned');
+    }
+
+    renderOutput(fullText);
+    document.getElementById('copyBtn').disabled = false;
+
+  } catch(err){
+    console.error(err);
+    outputArea.innerHTML = `
+      <div class="output-empty">
+        <p style="color:#B3543F;">Something went wrong generating the narrative. Please try again.</p>
+      </div>
+    `;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '✦ Generate Narrative';
+  }
+}
+
+let lastPlainText = '';
+
+function renderOutput(rawText){
+  lastPlainText = rawText;
+  const lines = rawText.split('\n');
+  let html = '';
+  let inList = false;
+  let paragraphBuffer = '';
+
+  function flushParagraph(){
+    if(paragraphBuffer.trim()){
+      html += `<p>${escapeAndTagClient(paragraphBuffer.trim())}</p>`;
+    }
+    paragraphBuffer = '';
+  }
+  function closeListIfOpen(){
+    if(inList){ html += '</ul>'; inList = false; }
+  }
+
+  lines.forEach(line => {
+    const trimmed = line.trim();
+    if(trimmed.startsWith('## ')){
+      flushParagraph();
+      closeListIfOpen();
+      html += `<h3>${trimmed.replace('## ', '')}</h3>`;
+    } else if(trimmed.startsWith('- ')){
+      flushParagraph();
+      if(!inList){ html += '<ul>'; inList = true; }
+      html += `<li>${escapeAndTagClient(trimmed.replace('- ', ''))}</li>`;
+    } else if(trimmed === ''){
+      flushParagraph();
+      closeListIfOpen();
+    } else {
+      paragraphBuffer += (paragraphBuffer ? ' ' : '') + trimmed;
+    }
+  });
+  flushParagraph();
+  closeListIfOpen();
+
+  document.getElementById('outputArea').innerHTML = `<div class="output-content">${html}</div>`;
+}
+
+function escapeAndTagClient(text){
+  const div = document.createElement('div');
+  div.textContent = text;
+  let escaped = div.innerHTML;
+  escaped = escaped.replace(/\bClient\b/g, '<strong class="client-tag">Client</strong>');
+  return escaped;
+}
+
+function copyOutput(){
+  if(!lastPlainText) return;
+  const btn = document.getElementById('copyBtn');
+  const original = btn.textContent;
+
+  function showCopied(){
+    btn.textContent = 'Copied ✓';
+    setTimeout(() => { btn.textContent = original; }, 1800);
+  }
+
+  function fallbackCopy(){
+    const textarea = document.createElement('textarea');
+    textarea.value = lastPlainText;
+    textarea.style.position = 'fixed';
+    textarea.style.top = '-1000px';
+    textarea.style.left = '-1000px';
+    document.body.appendChild(textarea);
+    textarea.focus();
+    textarea.select();
+    try{
+      const success = document.execCommand('copy');
+      document.body.removeChild(textarea);
+      if(success){
+        showCopied();
+      } else {
+        promptManualCopy(textarea.value);
+      }
+    } catch(err){
+      document.body.removeChild(textarea);
+      promptManualCopy(lastPlainText);
+    }
+  }
+
+  function promptManualCopy(){
+    btn.textContent = 'Select text below to copy';
+    setTimeout(() => { btn.textContent = original; }, 2500);
+    const textarea = document.createElement('textarea');
+    textarea.value = lastPlainText;
+    textarea.readOnly = true;
+    textarea.style.width = '100%';
+    textarea.style.height = '160px';
+    textarea.style.marginTop = '12px';
+    textarea.style.fontFamily = "'IBM Plex Mono', monospace";
+    textarea.style.fontSize = '12px';
+    textarea.style.padding = '10px';
+    textarea.style.border = '1px solid var(--line)';
+    textarea.style.borderRadius = '8px';
+    const existing = document.getElementById('manualCopyBox');
+    if(existing) existing.remove();
+    textarea.id = 'manualCopyBox';
+    document.getElementById('outputArea').prepend(textarea);
+    textarea.select();
+  }
+
+  if(navigator.clipboard && navigator.clipboard.writeText && window.isSecureContext !== false){
+    navigator.clipboard.writeText(lastPlainText).then(showCopied).catch(fallbackCopy);
+  } else {
+    fallbackCopy();
+  }
+}
+
+function resetForm(){
+  document.getElementById('qualification').value = '';
+  document.querySelectorAll('.area-check').forEach(el => el.checked = false);
+  document.getElementById('priorProgressToggle').checked = false;
+  document.getElementById('priorGoalsContainer').innerHTML = '';
+  document.getElementById('priorGoalsContainer').classList.remove('visible');
+  document.getElementById('addPriorBtn').style.display = 'none';
+  document.getElementById('newGoalsContainer').innerHTML = '';
+  addNewGoal();
+  document.getElementById('pronounSelect').value = 'he/him/his';
+  document.getElementById('pronounCustom').style.display = 'none';
+  document.getElementById('pronounCustom').value = '';
+  showError('');
+  document.getElementById('copyBtn').disabled = true;
+  lastPlainText = '';
+  document.getElementById('outputArea').innerHTML = `
+    <div class="output-empty" id="outputEmpty">
+      <svg class="root-divider" viewBox="0 0 120 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M60 2 L60 14 M60 14 L30 26 M60 14 L90 26 M30 26 L15 38 M30 26 L38 38 M90 26 L78 38 M90 26 L102 38" stroke="#4F7A63" stroke-width="1.5" stroke-linecap="round"/>
+        <circle cx="60" cy="2" r="3" fill="#C7883F"/>
+      </svg>
+      <p>Fill in the client details on the left, then generate to see the narrative sections here.</p>
+    </div>
+  `;
+}
+</script>
+</body>
+</html>
