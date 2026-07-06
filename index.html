@@ -92,14 +92,11 @@
   }
 
   .grid{
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    display: flex;
+    flex-direction: column;
     gap: 28px;
-    align-items: start;
-  }
-
-  @media (max-width: 940px){
-    .grid{ grid-template-columns: 1fr; }
+    max-width: 760px;
+    margin: 0 auto;
   }
 
   .panel{
@@ -110,11 +107,7 @@
   }
 
   .panel.output{
-    position: sticky;
-    top: 24px;
-  }
-  @media (max-width: 940px){
-    .panel.output{ position: static; }
+    position: static;
   }
 
   .section-title{
@@ -773,6 +766,7 @@ A bulleted list ("- " format) of realistic, tailored accommodation/modification 
     }
 
     renderOutput(fullText);
+    document.querySelector('.panel.output').scrollIntoView({ behavior: 'smooth', block: 'start' });
     document.getElementById('copyBtn').disabled = false;
 
   } catch(err){
