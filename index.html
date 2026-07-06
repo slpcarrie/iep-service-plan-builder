@@ -539,7 +539,7 @@ let priorGoalCount = 0;
 let newGoalCount = 0;
 
 // ⚠️ Replace this with your deployed Vercel function URL (Step 2 below)
-const API_ENDPOINT = "https://iep-service-plan-builder.vercel.app/api/generate";
+const API_ENDPOINT = "https://YOUR-VERCEL-PROJECT.vercel.app/api/generate";
 
 function toggleCustomPronoun(){
   const sel = document.getElementById('pronounSelect');
@@ -609,7 +609,8 @@ function addNewGoal(){
     </div>
     <div class="sub-field">
       <label class="mini-label">What it looks like in the natural environment</label>
-      <textarea class="new-goal-environment" placeholder="e.g., leaves out verb endings during class discussions, writing shows fragmented sentences"></textarea>
+      <p class="hint" style="margin-top:-2px;">Include formal/informal assessment data as well as teacher and caregiver reports here (as needed)</p>
+      <textarea class="new-goal-environment" style="min-height:110px;" placeholder="e.g., leaves out verb endings during class discussions, writing shows fragmented sentences"></textarea>
     </div>
     <div class="sub-field">
       <label class="mini-label">Goal (include accuracy level and level of support allowed)</label>
@@ -732,7 +733,7 @@ One paragraph: a warm, clear statement of what Client qualifies for and a descri
 (Only include this section if prior goal data is provided.) One paragraph per prior goal. Each paragraph should describe what was targeted, the most recent performance data given, whether the goal was met/partially met/not met/still in progress, and any additional notes — in honest but encouraging language.
 
 ## New Goals for This Year
-One paragraph per new goal. Each paragraph must open with a direct statement of what Client currently struggles with — for example, "Client currently struggles to use past tense verbs accurately during conversation." Never open a goal paragraph with "Client is working on..." or similar phrasing. After that opening sentence, the paragraph must include, in flowing prose (not a list): (1) what struggling with this looks like day to day, (2) an impact statement connecting the challenge to Client's participation in the natural environment (classroom, home, social settings, etc.), and (3) a brief closing sentence describing how the skill will be addressed, based on the clinician's stated approach (which may be direct therapy, supporting caregivers/educators with generalization strategies and resources, or a mix of both), working toward the goal exactly as written by the clinician — quote or closely paraphrase the clinician's goal text so it is clearly recognizable. Do not default to assuming direct therapy if a different approach was specified.
+One paragraph per new goal. Each paragraph must open with a direct statement of what Client currently struggles with — for example, "Client currently struggles to use past tense verbs accurately during conversation." Never open a goal paragraph with "Client is working on..." or similar phrasing. After that opening sentence, the paragraph must include, in flowing prose (not a list): (1) what struggling with this looks like day to day in the natural environment — if formal/informal assessment data or teacher/caregiver reports were provided, weave the relevant details from them naturally into this part of the paragraph rather than omitting them, (2) an impact statement connecting the challenge to Client's participation in the natural environment (classroom, home, social settings, etc.), and (3) a brief closing sentence describing how the skill will be addressed, based on the clinician's stated approach (which may be direct therapy, supporting caregivers/educators with generalization strategies and resources, or a mix of both), working toward the goal exactly as written by the clinician — quote or closely paraphrase the clinician's goal text so it is clearly recognizable. Do not default to assuming direct therapy if a different approach was specified.
 
 ## Possible Accommodations & Modifications
 A bulleted list ("- " format) of realistic, tailored accommodation/modification ideas relevant to the specific needs and challenges described. Before the list, include one sentence noting these are optional ideas to consider, not requirements — the team should only include a modification or accommodation if it is genuinely needed for Client, and many clients will need none at all. If a need area was checked but not directly addressed by a new goal, make sure to include at least one relevant suggestion covering that area.`;
