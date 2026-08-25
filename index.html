@@ -531,8 +531,9 @@
 let priorGoalCount = 0;
 let newGoalCount = 0;
 
-// ⚠️ Replace this with your deployed Vercel function URL (Step 2 below)
-const API_ENDPOINT = "https://YOUR-VERCEL-PROJECT.vercel.app/api/generate";
+// Relative path — always points to whatever domain this page is served from
+// (production, preview deploys, or a future custom domain) so it never goes stale.
+const API_ENDPOINT = "/api/generate";
 
 function toggleCustomPronoun(){
   const sel = document.getElementById('pronounSelect');
