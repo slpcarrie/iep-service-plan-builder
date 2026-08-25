@@ -531,9 +531,9 @@
 let priorGoalCount = 0;
 let newGoalCount = 0;
 
-// Relative path — always points to whatever domain this page is served from
-// (production, preview deploys, or a future custom domain) so it never goes stale.
-const API_ENDPOINT = "/api/generate";
+// This page is served from GitHub Pages (slpcarrie.github.io), but the API
+// function lives on Vercel — so this must be an absolute URL, not a relative one.
+const API_ENDPOINT = "https://iep-service-plan-builder.vercel.app/api/generate";
 
 function toggleCustomPronoun(){
   const sel = document.getElementById('pronounSelect');
